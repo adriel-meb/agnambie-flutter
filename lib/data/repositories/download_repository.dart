@@ -38,6 +38,7 @@ class DownloadRepository {
     int chapter, {
     String? bibleVersion,
     String? bibleName,
+    String? language,
   }) async {
     final dir = await getApplicationDocumentsDirectory();
     final ext = url.contains('.m3u8') ? '.m3u8' : '.mp3'; // Fallback for media container extension
@@ -61,6 +62,7 @@ class DownloadRepository {
       downloadedAt: DateTime.now(),
       bibleVersion: bibleVersion,
       bibleName: bibleName,
+      language: language,
     );
 
     await _localData.saveDownload(download);

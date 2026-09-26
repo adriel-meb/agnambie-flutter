@@ -151,6 +151,7 @@ void showDownloadSheet(
                           chapter,
                           bibleVersion: bible.abbr.isNotEmpty ? bible.abbr : bible.name,
                           bibleName: bible.name,
+                          language: bible.language,
                         );
                         downloadedCount++;
                         progressNotifier.updateProgress(downloadKey, downloadedCount);

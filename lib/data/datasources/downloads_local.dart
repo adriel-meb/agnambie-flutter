@@ -54,6 +54,7 @@ class HiveDownloadsLocalDataSource implements DownloadsLocalDataSource {
       'downloadedAt': download.downloadedAt.toIso8601String(),
       'bibleVersion': download.bibleVersion,
       'bibleName': download.bibleName,
+      'language': download.language,
     });
   }
 
@@ -76,6 +77,7 @@ class HiveDownloadsLocalDataSource implements DownloadsLocalDataSource {
               : DateTime.now(),
           bibleVersion: rawItem['bibleVersion'] as String?,
           bibleName: rawItem['bibleName'] as String?,
+          language: rawItem['language'] as String?,
         ));
       }
     }
@@ -108,6 +110,7 @@ class HiveDownloadsLocalDataSource implements DownloadsLocalDataSource {
           : DateTime.now(),
       bibleVersion: rawItem['bibleVersion'] as String?,
       bibleName: rawItem['bibleName'] as String?,
+      language: rawItem['language'] as String?,
     );
   }
 }

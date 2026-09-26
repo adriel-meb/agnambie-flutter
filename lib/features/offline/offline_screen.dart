@@ -24,6 +24,7 @@ class _GroupedBookDownloads {
   final String bookId;
   final String? bibleVersion;
   final String? bibleName;
+  final String? language;
   final List<Download> chapters;
 
   _GroupedBookDownloads({
@@ -31,6 +32,7 @@ class _GroupedBookDownloads {
     required this.bookId,
     this.bibleVersion,
     this.bibleName,
+    this.language,
     required this.chapters,
   });
 
@@ -123,6 +125,7 @@ class OfflineScreen extends ConsumerWidget {
                       bookId: item.bookId,
                       bibleVersion: item.bibleVersion,
                       bibleName: item.bibleName,
+                      language: item.language,
                       chapters: <Download>[],
                     );
                   }
@@ -155,6 +158,10 @@ class OfflineScreen extends ConsumerWidget {
                       versionText = group.bibleId;
                     }
 
+                    final languagePrefix = group.language != null && group.language!.isNotEmpty
+                        ? '${group.language!} · '
+                        : '';
+
                     final chapterCountText =
                         '${group.chapters.length} ${group.chapters.length > 1 ? 'chapitres' : 'chapitre'}';
 
@@ -182,7 +189,7 @@ class OfflineScreen extends ConsumerWidget {
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         subtitle: Text(
-                          '$sizeMb MB · $versionText · $chapterCountText',
+                          '$languagePrefix$sizeMb MB · $versionText · $chapterCountText',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -261,7 +268,7 @@ class OfflineScreen extends ConsumerWidget {
                               ),
                               onTap: () {
                                 ref.read(playerControllerProvider.notifier).playChapter(
-                                      languageIso: '',
+                                      languageIso: group.language ?? '',
                                       bibleId: chapterItem.bibleId,
                                       filesetId: chapterItem.bibleId,
                                       bookId: chapterItem.bookId,

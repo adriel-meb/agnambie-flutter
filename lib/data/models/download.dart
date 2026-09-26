@@ -38,6 +38,9 @@ class Download {
   /// Optional full title of the Bible translation (e.g. "Louis Segond 1910").
   final String? bibleName;
 
+  /// Optional language name (e.g. "Fang", "Français").
+  final String? language;
+
   /// Creates an immutable [Download] record representing an offline audio track.
   const Download({
     required this.bibleId,
@@ -48,6 +51,7 @@ class Download {
     required this.downloadedAt,
     this.bibleVersion,
     this.bibleName,
+    this.language,
   });
 
   // Not an API model, but providing copyWith and basic serialization 
@@ -63,6 +67,7 @@ class Download {
     DateTime? downloadedAt,
     String? bibleVersion,
     String? bibleName,
+    String? language,
   }) {
     // Preserve existing field values if no replacement argument is supplied
     return Download(
@@ -74,6 +79,7 @@ class Download {
       downloadedAt: downloadedAt ?? this.downloadedAt,
       bibleVersion: bibleVersion ?? this.bibleVersion,
       bibleName: bibleName ?? this.bibleName,
+      language: language ?? this.language,
     );
   }
 }
