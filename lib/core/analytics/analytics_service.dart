@@ -15,6 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 import '../network/api_client.dart';
+import '../network/api_logger.dart';
 
 /// Service responsible for recording user engagement and telemetry offline,
 /// batching them in local storage, and syncing them when online.
@@ -103,6 +104,7 @@ class AnalyticsService {
       if (response.statusCode == 200 || response.statusCode == 204) {
         // Successfully accepted by server — safely clear flushed events
         await box.clear();
+        ApiLogger.logAnalytics('Flushed ${events.length} queued events to server');
       }
     } catch (e) {
       debugPrint('[Analytics] Batch sync failed (will retry): $e');

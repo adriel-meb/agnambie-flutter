@@ -14,6 +14,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive/hive.dart';
 import 'api_exception.dart';
+import 'api_logger.dart';
 
 /// Provides a configured Dio instance for the entire app.
 /// 
@@ -79,7 +80,8 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          debugPrint('--> ${options.method.toUpperCase()} ${options.uri}');
+          options.extra['startTime'] = DateTime.now();
+          ApiLogger.logRequest(options);
           try {
              if (Hive.isBoxOpen('settings_bools')) {
                final box = Hive.box<bool>('settings_bools');
@@ -98,11 +100,15 @@ class ApiClient {
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          debugPrint('<-- ${response.statusCode} ${response.requestOptions.uri}');
+          final start = response.requestOptions.extra['startTime'] as DateTime?;
+          final duration = start != null ? DateTime.now().difference(start) : Duration.zero;
+          ApiLogger.logResponse(response, duration);
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          debugPrint('<-- Error: ${e.message} on ${e.requestOptions.uri}');
+          final start = e.requestOptions.extra['startTime'] as DateTime?;
+          final duration = start != null ? DateTime.now().difference(start) : null;
+          ApiLogger.logError(e, duration);
           
           // Transform DioException into our typed ApiException
           if (e.type == DioExceptionType.connectionTimeout ||

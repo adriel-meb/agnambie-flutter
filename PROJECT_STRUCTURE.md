@@ -102,6 +102,17 @@ error transformation.
 **Depends on:** `dio`, `dio_cache_interceptor`, `hive`  
 **Depended on by:** `data/sources/bible_brain_source.dart`
 
+### `core/network/api_logger.dart`
+
+**Responsibility:** structured ANSI color-coded console logger.
+
+Formats outgoing HTTP requests (`🌐 [HTTP] GET /path`), responses (`✅ [HTTP] 200 OK (45ms)`),
+failures (`❌ [HTTP] 500 ERR`), and offline analytics flushes (`📊 [ANALYTICS]`) with
+clean terminal escape sequences for instant visual scanning in debug mode.
+
+**Depends on:** `dio`, `flutter/foundation.dart`  
+**Depended on by:** `core/network/api_client.dart`, `core/analytics/analytics_service.dart`
+
 ### `core/network/api_exception.dart`
 
 **Responsibility:** typed error hierarchy so callers can distinguish failure modes.
