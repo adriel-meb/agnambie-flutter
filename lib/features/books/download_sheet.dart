@@ -149,6 +149,8 @@ void showDownloadSheet(
                           filesetId,
                           book.bookId,
                           chapter,
+                          bibleVersion: bible.abbr.isNotEmpty ? bible.abbr : bible.name,
+                          bibleName: bible.name,
                         );
                         downloadedCount++;
                         progressNotifier.updateProgress(downloadKey, downloadedCount);

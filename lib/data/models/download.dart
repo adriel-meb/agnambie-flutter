@@ -32,6 +32,12 @@ class Download {
   /// Date and time when the chapter was downloaded and saved.
   final DateTime downloadedAt;
 
+  /// Optional human-readable version abbreviation (e.g. "LSG", "FC").
+  final String? bibleVersion;
+
+  /// Optional full title of the Bible translation (e.g. "Louis Segond 1910").
+  final String? bibleName;
+
   /// Creates an immutable [Download] record representing an offline audio track.
   const Download({
     required this.bibleId,
@@ -40,6 +46,8 @@ class Download {
     required this.filePath,
     required this.sizeInBytes,
     required this.downloadedAt,
+    this.bibleVersion,
+    this.bibleName,
   });
 
   // Not an API model, but providing copyWith and basic serialization 
@@ -53,6 +61,8 @@ class Download {
     String? filePath,
     int? sizeInBytes,
     DateTime? downloadedAt,
+    String? bibleVersion,
+    String? bibleName,
   }) {
     // Preserve existing field values if no replacement argument is supplied
     return Download(
@@ -62,6 +72,8 @@ class Download {
       filePath: filePath ?? this.filePath,
       sizeInBytes: sizeInBytes ?? this.sizeInBytes,
       downloadedAt: downloadedAt ?? this.downloadedAt,
+      bibleVersion: bibleVersion ?? this.bibleVersion,
+      bibleName: bibleName ?? this.bibleName,
     );
   }
 }
