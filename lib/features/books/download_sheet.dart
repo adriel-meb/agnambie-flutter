@@ -16,13 +16,16 @@ import '../../core/analytics/analytics_service.dart';
 import '../../data/models/bible_edition.dart';
 import '../../data/models/book.dart';
 import '../../data/repositories/providers.dart';
+import '../offline/offline_providers.dart';
 import '../settings/settings_providers.dart';
+import 'download_providers.dart';
 
 /// Displays a modal bottom sheet allowing the user to download audio for [book].
 ///
 /// Computes and presents the estimated download size based on chapter count and
-/// active data-saver preferences. Downloads chapters sequentially using [filesetId]
-/// and persists them to local storage.
+/// active data-saver preferences. Downloads chapters sequentially using [filesetId],
+/// streams live progression through [bookDownloadProgressProvider], and updates
+/// offline storage caches upon completion.
 void showDownloadSheet(
   BuildContext context,
   BibleEdition bible,
@@ -47,6 +50,7 @@ void showDownloadSheet(
                   : '${totalMb.toStringAsFixed(1)} Mo';
 
           final theme = Theme.of(context);
+          final downloadKey = bookDownloadKey(filesetId, book.bookId);
 
           return SafeArea(
             child: Column(
@@ -93,13 +97,6 @@ void showDownloadSheet(
                   ),
                   onTap: () async {
                     Navigator.pop(sheetContext);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Téléchargement de ${book.name} commencé (~$sizeFormatted)...',
-                        ),
-                      ),
-                    );
 
                     final isWifiOnly = ref.read(wifiOnlyModeProvider);
                     if (isWifiOnly) {
@@ -118,11 +115,25 @@ void showDownloadSheet(
                       }
                     }
 
+                    if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Téléchargement de ${book.name} commencé (~$sizeFormatted)...',
+                        ),
+                      ),
+                    );
+
                     final catalog = ref.read(catalogRepositoryProvider);
                     final downloader = ref.read(downloadRepositoryProvider);
+                    final progressNotifier =
+                        ref.read(bookDownloadProgressProvider.notifier);
+
+                    progressNotifier.startDownload(downloadKey, chapterCount);
 
                     int downloadedCount = 0;
-                    int failedCount = 0;
+                    String? lastErrorMessage;
 
                     for (final rawChapter in book.chapters) {
                       final chapter = rawChapter as int;
@@ -140,6 +151,8 @@ void showDownloadSheet(
                           chapter,
                         );
                         downloadedCount++;
+                        progressNotifier.updateProgress(downloadKey, downloadedCount);
+
                         unawaited(
                           ref.read(analyticsServiceProvider).logEvent(
                             'chapter_downloaded',
@@ -153,13 +166,24 @@ void showDownloadSheet(
                           ),
                         );
                       } catch (e) {
-                        failedCount++;
+                        lastErrorMessage = e.toString();
                         debugPrint('Failed to download ch $chapter: $e');
+                        // Notify error on the first failure or continue attempting remaining chapters
                       }
                     }
 
+                    // Invalidate caches so offline list and storage indicators refresh immediately
+                    ref.invalidate(offlineDownloadsProvider);
+                    ref.invalidate(totalStorageUsedProvider);
+
+                    if (lastErrorMessage != null) {
+                      progressNotifier.setError(downloadKey, lastErrorMessage);
+                    } else {
+                      progressNotifier.finishDownload(downloadKey);
+                    }
+
                     if (context.mounted) {
-                      if (failedCount == 0 && downloadedCount > 0) {
+                      if (lastErrorMessage == null && downloadedCount > 0) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -171,15 +195,16 @@ void showDownloadSheet(
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              '$downloadedCount chapitres téléchargés, $failedCount en échec.',
+                              '$downloadedCount/${book.chapters.length} chapitres téléchargés. Erreur sur certains chapitres.',
                             ),
                           ),
                         );
-                      } else if (failedCount > 0) {
+                      } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.red.shade800,
                             content: Text(
-                              'Échec du téléchargement. Veuillez vérifier votre connexion.',
+                              'Échec du téléchargement de ${book.name} : ${lastErrorMessage ?? "erreur réseau"}.',
                             ),
                           ),
                         );
