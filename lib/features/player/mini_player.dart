@@ -33,33 +33,35 @@ class MiniPlayer extends ConsumerWidget {
     final player = playerRepo.player;
 
 
-    return GestureDetector(
-      onTap: () {
-        // Open full player screen modally
-        Navigator.push(
-          context,
-          MaterialPageRoute<void>(
-            builder: (context) => const PlayerScreen(),
-            fullscreenDialog: true,
+    return SafeArea(
+      top: false,
+      child: GestureDetector(
+        onTap: () {
+          // Open full player screen modally
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (context) => const PlayerScreen(),
+              fullscreenDialog: true,
+            ),
+          );
+        },
+        child: Container(
+          height: 64,
+          margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF14271d), // Match player background
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                offset: Offset(0, -2),
+              )
+            ],
           ),
-        );
-      },
-      child: Container(
-        height: 64,
-        margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF14271d), // Match player background
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 10,
-              offset: Offset(0, -2),
-            )
-          ],
-        ),
-        child: Row(
-          children: [
+          child: Row(
+            children: [
             // Track Info
             Expanded(
               child: Padding(
@@ -142,6 +144,7 @@ class MiniPlayer extends ConsumerWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

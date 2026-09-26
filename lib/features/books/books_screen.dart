@@ -11,6 +11,7 @@ import '../../core/constants/gabon.dart';
 import '../../data/models/bible_edition.dart';
 import '../../widgets/app_error_view.dart';
 import '../../widgets/skeleton.dart';
+import '../player/mini_player.dart';
 import 'books_providers.dart';
 import 'widgets/bible_header.dart';
 import 'widgets/book_row.dart';
@@ -39,6 +40,7 @@ class BooksScreen extends ConsumerWidget {
     final booksAsyncValue = ref.watch(booksProvider(request));
 
     return Scaffold(
+      bottomNavigationBar: const MiniPlayer(),
       appBar: AppBar(
         title: const Text(
           Constants.APP_TITLE,

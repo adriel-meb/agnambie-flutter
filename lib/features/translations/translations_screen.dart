@@ -14,6 +14,7 @@ import '../../widgets/bible_row.dart';
 import '../../widgets/skeleton.dart';
 
 import '../books/books_screen.dart';
+import '../player/mini_player.dart';
 import 'translations_providers.dart';
 
 /// A screen displaying all available Bible editions/translations for a specific [Language].
@@ -34,6 +35,7 @@ class TranslationsScreen extends ConsumerWidget {
     final biblesAsyncValue = ref.watch(biblesProvider(language.code));
 
     return Scaffold(
+      bottomNavigationBar: const MiniPlayer(),
       appBar: AppBar(
         title: const Text(
           Constants.APP_TITLE,
