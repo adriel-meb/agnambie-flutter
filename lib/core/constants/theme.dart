@@ -81,6 +81,18 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: GoogleFonts.poppins(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: AppColors.lightTextPrimary,
+        ),
+        subtitleTextStyle: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.normal,
+          color: AppColors.lightTextMuted,
+        ),
+      ),
     );
   }
 
@@ -146,6 +158,18 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+      ),
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: GoogleFonts.poppins(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: AppColors.darkTextPrimary,
+        ),
+        subtitleTextStyle: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.normal,
+          color: AppColors.darkTextMuted,
         ),
       ),
     );

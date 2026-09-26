@@ -1,13 +1,16 @@
 // -----------------------------------------------------------------------------
 // File: settings_screen.dart
-// Purpose: User-facing settings screen for app preferences and sleep timer.
+// Purpose: User-facing settings screen for app preferences, sleep timer, and developer contact.
 // Author: Agnambie Team
 // Creation Date: 2026-09-26
 // Last Modified: 2026-09-26
 // -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'settings_providers.dart';
 
@@ -18,6 +21,99 @@ import 'settings_providers.dart';
 class SettingsScreen extends ConsumerWidget {
   /// Creates a [SettingsScreen] instance.
   const SettingsScreen({super.key});
+
+  /// Opens the default mail application to write to the developer,
+  /// or presents a fallback contact sheet if no mail client responds.
+  Future<void> _contactDeveloper(BuildContext context) async {
+    const email = 'adrix92@live.fr';
+    final Uri mailUri = Uri(
+      scheme: 'mailto',
+      path: email,
+      query: 'subject=[Agnambie] Contact / Retours',
+    );
+
+    try {
+      final launched = await launchUrl(
+        mailUri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && context.mounted) {
+        _showContactSheet(context, email);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        _showContactSheet(context, email);
+      }
+    }
+  }
+
+  /// Displays a modal bottom sheet with the developer contact email and a copy button.
+  void _showContactSheet(BuildContext context, String email) {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Contacter le développeur',
+                  style: Theme.of(sheetContext).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Vous pouvez nous contacter directement à l\'adresse suivante :',
+                  style: Theme.of(sheetContext).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(sheetContext).colorScheme.surfaceContainer,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(sheetContext).colorScheme.outline,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.email_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SelectableText(
+                          email,
+                          style: Theme.of(sheetContext).textTheme.titleMedium,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.copy_rounded, size: 20),
+                        tooltip: 'Copier l\'adresse',
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: email));
+                          Navigator.pop(sheetContext);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Adresse e-mail copiée dans le presse-papiers.'),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -139,6 +235,19 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
+
+          const Divider(),
+
+          // ── Support & Contact ───────────────────────────────────────────
+          const _SectionHeader(label: 'Support & Contact'),
+
+          ListTile(
+            leading: const Icon(Icons.mail_outline_rounded),
+            title: const Text('Contacter le développeur'),
+            subtitle: const Text('Une question, suggestion ou problème ? Écrivez-nous.'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () => _contactDeveloper(context),
+          ),
         ],
       ),
     );
@@ -152,7 +261,7 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-/// A simple section header for grouping settings visually.
+/// A section header for grouping settings visually with strong typography.
 class _SectionHeader extends StatelessWidget {
   final String label;
   const _SectionHeader({required this.label});
@@ -161,10 +270,13 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 6),
       child: Text(
         label.toUpperCase(),
-        style: theme.textTheme.labelSmall?.copyWith(
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
           color: theme.colorScheme.primary,
         ),
       ),
