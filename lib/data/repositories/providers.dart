@@ -6,16 +6,15 @@
 // Last modified: 2026-09-26
 // =============================================================================
 
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'catalog_repository.dart';
 import 'player_repository.dart';
 import '../sources/source_registry.dart';
 
-
 import 'audio_handler.dart';
 import 'download_repository.dart';
 import '../datasources/downloads_local.dart';
-import '../../core/network/api_client.dart';
 
 
 /// Provides a singleton-like instance of [SourceRegistry].
@@ -72,7 +71,18 @@ final downloadsLocalDataSourceProvider = Provider<DownloadsLocalDataSource>((ref
   return HiveDownloadsLocalDataSource();
 });
 
+/// Dedicated Dio HTTP client for binary audio downloads with extended timeouts.
+final downloadDioProvider = Provider<Dio>((ref) {
+  return Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(minutes: 5),
+    ),
+  );
+});
+
 final downloadRepositoryProvider = Provider<DownloadRepository>((ref) {
   final localData = ref.watch(downloadsLocalDataSourceProvider);
-  return DownloadRepository(localData, ApiClient().dio);
+  final dio = ref.watch(downloadDioProvider);
+  return DownloadRepository(localData, dio);
 });

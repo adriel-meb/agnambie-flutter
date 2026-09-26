@@ -153,6 +153,10 @@ void showDownloadSheet(
                         downloadedCount++;
                         progressNotifier.updateProgress(downloadKey, downloadedCount);
 
+                        // Invalidate caches so offline list and storage indicators refresh immediately
+                        ref.invalidate(offlineDownloadsProvider);
+                        ref.invalidate(totalStorageUsedProvider);
+
                         unawaited(
                           ref.read(analyticsServiceProvider).logEvent(
                             'chapter_downloaded',

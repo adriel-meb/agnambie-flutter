@@ -10,10 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/utils/book_names.dart';
-import 'offline_providers.dart';
 import '../../data/repositories/providers.dart';
 import '../../widgets/app_error_view.dart';
 import '../../widgets/skeleton.dart';
+import '../player/player_controller.dart';
+import '../player/player_screen.dart';
+import 'offline_providers.dart';
 
 /// Screen showing the user's downloaded Bible audio content.
 ///
@@ -128,6 +130,23 @@ class OfflineScreen extends ConsumerWidget {
                           ref.invalidate(totalStorageUsedProvider);
                         },
                       ),
+                      onTap: () {
+                        ref.read(playerControllerProvider.notifier).playChapter(
+                          languageIso: '',
+                          bibleId: item.bibleId,
+                          filesetId: item.bibleId,
+                          bookId: item.bookId,
+                          bookName: bookDisplay,
+                          chapter: item.chapter,
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (context) => const PlayerScreen(),
+                            fullscreenDialog: true,
+                          ),
+                        );
+                      },
                     );
                   },
                 );
