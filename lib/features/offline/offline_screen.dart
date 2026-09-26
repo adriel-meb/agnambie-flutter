@@ -39,6 +39,70 @@ class _GroupedBookDownloads {
   int get totalBytes => chapters.fold<int>(0, (sum, item) => sum + item.sizeInBytes);
 }
 
+/// Resolves a human-readable language name from saved metadata or Bible ID prefix.
+String _resolveLanguage(String? language, String bibleId) {
+  if (language != null && language.trim().isNotEmpty) {
+    return language.trim();
+  }
+  final upper = bibleId.toUpperCase();
+  if (upper.startsWith('FAN')) return 'Fang';
+  if (upper.startsWith('MYE')) return 'Myène';
+  if (upper.startsWith('PUU')) return 'Punu';
+  if (upper.startsWith('NZB')) return 'Nzebi';
+  if (upper.startsWith('FRA') || upper.startsWith('FRN')) return 'Français';
+  if (upper.startsWith('BKW')) return 'Bekwel';
+  if (upper.startsWith('BBG')) return 'Barama';
+  if (upper.startsWith('BUW')) return 'Bubi';
+  if (upper.startsWith('DMA')) return 'Duma';
+  if (upper.startsWith('KEB')) return 'Kélé';
+  if (upper.startsWith('LUP')) return 'Lumbu';
+  if (upper.startsWith('ZMN')) return 'Mbangwe';
+  if (upper.startsWith('NMD')) return 'Ndumu';
+  if (upper.startsWith('PIC')) return 'Pinji';
+  if (upper.startsWith('TSV')) return 'Tsogo';
+  if (upper.startsWith('VIF')) return 'Vili';
+  if (upper.startsWith('SYX')) return 'Samay';
+  if (upper.startsWith('SYI')) return 'Seki';
+  if (upper.startsWith('BNG')) return 'Benga';
+  return '';
+}
+
+/// Resolves a version abbreviation or label from saved metadata or Bible ID pattern.
+String _resolveVersion(String? bibleVersion, String bibleId, String? bibleName) {
+  // If a descriptive custom version is saved and distinct from raw ID, use it
+  if (bibleVersion != null &&
+      bibleVersion.trim().isNotEmpty &&
+      bibleVersion != bibleId) {
+    return '$bibleVersion ($bibleId)';
+  }
+  final upper = bibleId.toUpperCase();
+  if (upper.contains('BSG')) {
+    return 'BSG ($bibleId)';
+  }
+  if (upper.contains('TLS') || upper.contains('LSN') || upper.contains('LSG')) {
+    return 'LSG ($bibleId)';
+  }
+  if (upper.contains('PDV') || upper.contains('PDC')) {
+    return 'PDV ($bibleId)';
+  }
+  if (upper.contains('DPI')) {
+    return 'DPI ($bibleId)';
+  }
+  if (upper.contains('UBS')) {
+    return 'UBS ($bibleId)';
+  }
+  if (upper.contains('CIE')) {
+    return 'CIE ($bibleId)';
+  }
+  if (upper.contains('WBT')) {
+    return 'WBT ($bibleId)';
+  }
+  if (bibleName != null && bibleName.trim().isNotEmpty) {
+    return '$bibleName ($bibleId)';
+  }
+  return bibleId;
+}
+
 /// Screen showing the user's downloaded Bible audio content grouped by book.
 ///
 /// Displays a storage usage summary at the top and expandable cards per book,
@@ -120,12 +184,13 @@ class OfflineScreen extends ConsumerWidget {
                 for (final item in downloads) {
                   final groupKey = '${item.bibleId}_${item.bookId}';
                   if (!groupedMap.containsKey(groupKey)) {
+                    final resolvedLang = _resolveLanguage(item.language, item.bibleId);
                     groupedMap[groupKey] = _GroupedBookDownloads(
                       bibleId: item.bibleId,
                       bookId: item.bookId,
                       bibleVersion: item.bibleVersion,
                       bibleName: item.bibleName,
-                      language: item.language,
+                      language: resolvedLang,
                       chapters: <Download>[],
                     );
                   }
@@ -147,19 +212,15 @@ class OfflineScreen extends ConsumerWidget {
                     final sizeMb = (group.totalBytes / (1024 * 1024)).toStringAsFixed(1);
 
                     // Build version label: version abbreviation with fileset ID or fallback
-                    final String versionText;
-                    if (group.bibleVersion != null && group.bibleVersion!.isNotEmpty) {
-                      if (group.bibleVersion == group.bibleId) {
-                        versionText = group.bibleVersion!;
-                      } else {
-                        versionText = '${group.bibleVersion} (${group.bibleId})';
-                      }
-                    } else {
-                      versionText = group.bibleId;
-                    }
+                    final String versionText = _resolveVersion(
+                      group.bibleVersion,
+                      group.bibleId,
+                      group.bibleName,
+                    );
 
-                    final languagePrefix = group.language != null && group.language!.isNotEmpty
-                        ? '${group.language!} · '
+                    final resolvedLang = _resolveLanguage(group.language, group.bibleId);
+                    final languagePrefix = resolvedLang.isNotEmpty
+                        ? '$resolvedLang · '
                         : '';
 
                     final chapterCountText =
