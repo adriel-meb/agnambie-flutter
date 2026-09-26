@@ -1,0 +1,42 @@
+name: agnambie
+description: "Offline-friendly Gabonese audio Bible application."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  audio_service: ^0.18.19
+  audio_session: ^0.2.4
+  connectivity_plus: ^7.3.1
+  dio: ^5.11.1
+  dio_cache_interceptor: ^3.5.1
+  dio_cache_interceptor_hive_store: ^4.0.0
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  google_fonts: ^8.2.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  just_audio: ^0.10.6
+  path_provider: ^2.1.6
+  shimmer: ^4.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
+  min_sdk_android: 21
