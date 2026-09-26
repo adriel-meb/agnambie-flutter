@@ -1,7 +1,10 @@
+// -----------------------------------------------------------------------------
+// File: home_screen.dart
 // Purpose: Main home screen displaying hero header, search bar, spotlight banner, and language list.
-// Author: [Author Placeholder]
+// Author: Agnambie Team
 // Creation Date: 2026-09-26
 // Last Modified: 2026-09-26
+// -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,22 +44,18 @@ class HomeScreen extends ConsumerWidget {
               // Header branding and hero titles.
               Text(
                 Constants.APP_SUBTITLE,
-                style: themeData.textTheme.titleMedium?.copyWith(
+                style: themeData.textTheme.labelSmall?.copyWith(
                   color: themeData.colorScheme.primary,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 Constants.HERO_TITLE,
-                style: themeData.textTheme.headlineLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 42,
-                ),
+                style: themeData.textTheme.displayLarge,
               ),
               const SizedBox(height: 3),
-              const Text(
+              Text(
                 Constants.HERO_DESCRIPTION,
-                style: TextStyle(fontSize: 18),
+                style: themeData.textTheme.bodyLarge,
               ),
               const SizedBox(height: 20),
 
@@ -79,10 +78,7 @@ class HomeScreen extends ConsumerWidget {
               // Language catalog section heading.
               Text(
                 'Langues du ${Constants.COUNTRY_NAME}',
-                style: themeData.textTheme.headlineLarge?.copyWith(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: themeData.textTheme.displaySmall,
               ),
               const SizedBox(height: 10),
               
@@ -122,7 +118,10 @@ class HomeScreen extends ConsumerWidget {
                   if (filtered.isEmpty) {
                     return Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Text("Aucun résultat pour '$searchQuery'."),
+                      child: Text(
+                        "Aucun résultat pour '$searchQuery'.",
+                        style: themeData.textTheme.bodyMedium,
+                      ),
                     );
                   }
                   

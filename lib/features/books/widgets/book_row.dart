@@ -1,8 +1,10 @@
+// -----------------------------------------------------------------------------
 // File: book_row.dart
 // Purpose: Displays an expandable row for a book with chapters.
-// Author: Placeholder
+// Author: Agnambie Team
 // Creation Date: 2026-09-26
 // Last Modified: 2026-09-26
+// -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -111,10 +113,7 @@ class _BookRowState extends State<BookRow> {
                                   widget.book.bookId,
                                   apiName: widget.book.name,
                                 ),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
+                                style: themeData.textTheme.titleMedium,
                               ),
                             ),
                             if (hasMultipleChapters)
@@ -122,7 +121,7 @@ class _BookRowState extends State<BookRow> {
                                 _isExpanded
                                     ? Icons.expand_less_rounded
                                     : Icons.expand_more_rounded,
-                                color: Colors.grey,
+                                color: themeData.colorScheme.onSurfaceVariant,
                               )
                             else
                               const Icon(Icons.play_arrow_rounded, size: 20),

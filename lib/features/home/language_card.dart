@@ -1,7 +1,10 @@
+// -----------------------------------------------------------------------------
+// File: language_card.dart
 // Purpose: List item widget representing a language and navigating to its available translations.
-// Author: [Author Placeholder]
+// Author: Agnambie Team
 // Creation Date: 2026-09-26
 // Last Modified: 2026-09-26
+// -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
@@ -57,7 +60,7 @@ class LanguageCard extends StatelessWidget {
                   children: [
                     Text(
                       language.nativeName, // Native name is bold in prototype
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: themeData.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 4),
                     // Format pluralized count of available audio Bible filesets.
@@ -65,14 +68,18 @@ class LanguageCard extends StatelessWidget {
                       language.filesets.length > 1
                           ? '${language.filesets.length} Bibles audio'
                           : '${language.filesets.length} Bible audio',
-                      style: const TextStyle(color: Colors.grey, fontSize: 13),
+                      style: themeData.textTheme.bodySmall,
                     ),
                   ],
                 ),
               ),
 
               // Trailing chevron
-              const Icon(Icons.chevron_right_rounded, color: Colors.grey, size: 24),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: themeData.colorScheme.onSurfaceVariant,
+                size: 24,
+              ),
             ],
           ),
         ),

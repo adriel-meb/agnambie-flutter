@@ -42,14 +42,7 @@ class BooksScreen extends ConsumerWidget {
     return Scaffold(
       bottomNavigationBar: const MiniPlayer(),
       appBar: AppBar(
-        title: const Text(
-          Constants.APP_TITLE,
-          style: TextStyle(
-            fontSize: 10,
-            letterSpacing: 2.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text(Constants.APP_TITLE),
         centerTitle: true,
       ),
       body: SafeArea(

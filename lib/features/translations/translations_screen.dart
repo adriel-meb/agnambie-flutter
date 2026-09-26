@@ -37,14 +37,7 @@ class TranslationsScreen extends ConsumerWidget {
     return Scaffold(
       bottomNavigationBar: const MiniPlayer(),
       appBar: AppBar(
-        title: const Text(
-          Constants.APP_TITLE,
-          style: TextStyle(
-            fontSize: 10,
-            letterSpacing: 2.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text(Constants.APP_TITLE),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -57,10 +50,7 @@ class TranslationsScreen extends ConsumerWidget {
               // Country flag and name header
               Text(
                 '${Constants.COUNTRY_FLAG} ${Constants.COUNTRY_NAME}',
-                style: TextStyle(
-                  fontSize: 10,
-                  letterSpacing: 2.0,
-                  fontWeight: FontWeight.bold,
+                style: themeData.textTheme.labelSmall?.copyWith(
                   color: themeData.colorScheme.primary,
                 ),
               ),
@@ -68,16 +58,13 @@ class TranslationsScreen extends ConsumerWidget {
               // Language title
               Text(
                 language.name,
-                style: themeData.textTheme.headlineLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'serif',
-                ),
+                style: themeData.textTheme.displaySmall,
               ),
               const SizedBox(height: 8),
               // Instructional subtitle
-              const Text(
+              Text(
                 'Choisissez une traduction audio.',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
+                style: themeData.textTheme.bodyMedium,
               ),
               const SizedBox(height: 24),
               
@@ -95,8 +82,11 @@ class TranslationsScreen extends ConsumerWidget {
                   ),
                   data: (bibles) {
                     if (bibles.isEmpty) {
-                      return const Center(
-                        child: Text('Aucune Bible ne correspond à votre recherche.', style: TextStyle(color: Colors.grey)),
+                      return Center(
+                        child: Text(
+                          'Aucune Bible ne correspond à votre recherche.',
+                          style: themeData.textTheme.bodyMedium,
+                        ),
                       );
                     }
                     return ListView.separated(

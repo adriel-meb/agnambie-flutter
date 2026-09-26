@@ -1,8 +1,10 @@
+// -----------------------------------------------------------------------------
 // File: bible_header.dart
 // Purpose: Displays the header information for a Bible edition.
-// Author: Placeholder
+// Author: Agnambie Team
 // Creation Date: 2026-09-26
 // Last Modified: 2026-09-26
+// -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
@@ -27,10 +29,7 @@ class BibleHeader extends StatelessWidget {
         // Flag and language banner
         Text(
           '${Constants.COUNTRY_FLAG} ${bible.language}',
-          style: TextStyle(
-            fontSize: 10,
-            letterSpacing: 2.0,
-            fontWeight: FontWeight.bold,
+          style: themeData.textTheme.labelSmall?.copyWith(
             color: themeData.colorScheme.primary,
           ),
         ),
@@ -38,17 +37,13 @@ class BibleHeader extends StatelessWidget {
         // Bible edition title
         Text(
           bible.name,
-          style: themeData.textTheme.headlineLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontFamily: 'serif',
-            height: 1.2,
-          ),
+          style: themeData.textTheme.displaySmall,
         ),
         const SizedBox(height: 8),
         // Optional detail text mapping coverage and audio type
-        const Text(
+        Text(
           'Audio · Bible complète', // Placeholder mapping text
-          style: TextStyle(color: Colors.grey, fontSize: 12),
+          style: themeData.textTheme.bodySmall,
         ),
       ],
     );

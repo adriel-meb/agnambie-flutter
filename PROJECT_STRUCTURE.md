@@ -271,7 +271,6 @@ when available.
 |---|---|
 | `app_error_view.dart` | Standardized user-facing error state with French text and retry button (`AppErrorView`) |
 | `bible_row.dart` | Bible edition card used on the translations list |
-| `language_card.dart` | Language entry card used on the home screen |
 | `nav_bar.dart` | Bottom navigation bar |
 | `skeleton.dart` | Loading skeleton placeholder (`SkeletonLoader`) |
 

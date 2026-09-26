@@ -77,9 +77,7 @@ class BibleRow extends StatelessWidget {
                   children: [
                     Text(
                       bible.name,
-                      style: themeData.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: themeData.textTheme.titleMedium,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -87,23 +85,25 @@ class BibleRow extends StatelessWidget {
                     // Displays country flag and localized language label
                     Text(
                       '${Constants.COUNTRY_FLAG} ${Constants.COUNTRY_NAME} · ${bible.language}',
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      style: themeData.textTheme.bodySmall,
                     ),
                     const SizedBox(height: 2),
                     // Indicates whether audio is dramatized or standard narration
                     Text(
                       audioText,
-                      style: TextStyle(
+                      style: themeData.textTheme.labelMedium?.copyWith(
                         color: themeData.colorScheme.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
               ),
               // Trailing chevron indicator for navigation affordance
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: themeData.colorScheme.onSurfaceVariant,
+              ),
             ],
           ),
         ),

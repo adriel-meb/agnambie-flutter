@@ -43,9 +43,8 @@ class AppTheme {
         scrolledUnderElevation: 0,
         iconTheme: const IconThemeData(color: AppColors.lightTextPrimary),
         titleTextStyle: GoogleFonts.poppins(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 2.0,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
           color: AppColors.lightTextPrimary,
         ),
       ),
@@ -111,9 +110,8 @@ class AppTheme {
         scrolledUnderElevation: 0,
         iconTheme: const IconThemeData(color: AppColors.darkTextPrimary),
         titleTextStyle: GoogleFonts.poppins(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 2.0,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
           color: AppColors.darkTextPrimary,
         ),
       ),

@@ -1,14 +1,17 @@
 
+// -----------------------------------------------------------------------------
+// File: spotlight.dart
 // Purpose: Featured spotlight banner widget highlighting primary or trending audio Bible content on the home screen.
-// Author: [Author Placeholder]
+// Author: Agnambie Team
 // Creation Date: 2026-09-26
 // Last Modified: 2026-09-26
+// -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 
-// A featured spotlight card displayed on the home screen.
-//
-// Highlights special or featured audio Bible releases (such as a dramatized
+/// A featured spotlight card displayed on the home screen.
+///
+/// Highlights special or featured audio Bible releases (such as a dramatized
 /// complete Bible) with high visual prominence and quick playback actions.
 class Spotlight extends StatelessWidget {
   /// Creates a [Spotlight] widget.
@@ -31,20 +34,25 @@ class Spotlight extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Badge header indicating featured spotlight content.
-              Text('À LA UNE', style: TextStyle(color: themeData.colorScheme.surface)),
+              Text(
+                'À LA UNE',
+                style: themeData.textTheme.labelSmall?.copyWith(
+                  color: themeData.colorScheme.surface,
+                ),
+              ),
               // Featured item title.
               Text(
                 'Bible en Fang',
-                style: themeData.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 27,
+                style: themeData.textTheme.displaySmall?.copyWith(
                   color: themeData.colorScheme.surface,
                 ),
               ),
               // Subtitle describing audio format and scope.
               Text(
-                'Audio dramatisé - Bible complete',
-                style: TextStyle(fontSize: 16, color: themeData.colorScheme.surface),
+                'Audio dramatisé - Bible complète',
+                style: themeData.textTheme.bodyMedium?.copyWith(
+                  color: themeData.colorScheme.surface.withValues(alpha: 0.9),
+                ),
               ),
               const SizedBox(height: 10),
 
@@ -62,10 +70,8 @@ class Spotlight extends StatelessWidget {
                       Icon(Icons.play_arrow, color: themeData.colorScheme.primary),
                       Text(
                         'Commencer',
-                        style: TextStyle(
-                          fontSize: 16,
+                        style: themeData.textTheme.titleSmall?.copyWith(
                           color: themeData.colorScheme.primary,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
