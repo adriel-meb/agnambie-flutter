@@ -1,10 +1,14 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/models/book.dart';
+
+import '../../core/analytics/analytics_service.dart';
 import '../../data/models/bible_edition.dart';
+import '../../data/models/book.dart';
 import '../../data/repositories/providers.dart';
 import '../settings/settings_providers.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 
 void showDownloadSheet(BuildContext context, BibleEdition bible, Book book, String filesetId) {
@@ -54,6 +58,14 @@ void showDownloadSheet(BuildContext context, BibleEdition bible, Book book, Stri
                            bible.language, bible.abbr, book.bookId, chapter
                         );
                         await downloader.downloadChapter(url, bible.abbr, book.bookId, chapter);
+                        unawaited(
+                          ref.read(analyticsServiceProvider).logEvent('chapter_downloaded', {
+                            'language_iso': bible.language,
+                            'bible_id': bible.abbr,
+                            'book_id': book.bookId,
+                            'chapter': chapter,
+                          }),
+                        );
                       } catch (e) {
                          debugPrint('Failed to download ch $chapter: $e');
                       }

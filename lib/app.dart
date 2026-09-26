@@ -17,6 +17,7 @@ import 'package:agnambie/features/offline/offline_screen.dart';
 import 'package:agnambie/features/settings/settings_screen.dart';
 import 'package:agnambie/features/player/mini_player.dart';
 
+import 'core/analytics/analytics_service.dart';
 import 'core/constants/theme.dart';
 
 /// The root widget of the Agnambie application.
@@ -38,6 +39,13 @@ class _MainAppState extends ConsumerState<MainApp> {
 
   // Navigation destinations mapped to bottom bar tabs
   final pages = const <Widget>[HomeScreen(), OfflineScreen(), SettingsScreen()];
+
+  @override
+  void initState() {
+    super.initState();
+    // Start offline-batched analytics service & auto-sync listener
+    ref.read(analyticsServiceProvider);
+  }
 
   @override
   Widget build(BuildContext context) {

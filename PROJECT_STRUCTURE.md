@@ -123,7 +123,17 @@ falling back gracefully to the API-provided name if no local mapping exists.
 Keeps all name logic out of the UI layer.
 
 **Depends on:** nothing  
-**Depended on by:** `features/books/`, `features/player/`, `lib/widgets/`
+### `core/analytics/analytics_service.dart`
+
+**Responsibility:** offline-first event logger with automatic batched syncing.
+
+Buffers telemetry events (`chapter_played`, `chapter_downloaded`) in local Hive storage
+without firing real-time HTTP requests. Automatically flushes accumulated events in a single
+compressed JSON batch to `/api/v1/metrics` when network connectivity is detected via
+`connectivity_plus`.
+
+**Depends on:** `hive`, `connectivity_plus`, `core/network/api_client.dart`  
+**Depended on by:** `app.dart`, `features/player/player_controller.dart`, `features/books/download_sheet.dart`
 
 ---
 

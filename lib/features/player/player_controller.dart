@@ -5,8 +5,11 @@
 // Last modified: 2026-09-26
 // -----------------------------------------------------------------------------
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/analytics/analytics_service.dart';
 import '../../data/repositories/providers.dart';
 
 /// Metadata model encapsulating details of an active or queued audio track.
@@ -139,6 +142,17 @@ class PlayerController extends Notifier<TrackMetadata?> {
         bibleId: filesetId,
         bookId: bookId,
         chapter: chapter,
+      );
+
+      // Record offline-batched analytics event
+      unawaited(
+        ref.read(analyticsServiceProvider).logEvent('chapter_played', {
+          'language_iso': languageIso,
+          'bible_id': bibleId,
+          'fileset_id': filesetId,
+          'book_id': bookId,
+          'chapter': chapter,
+        }),
       );
     } catch (e) {
       // Revert state so the UI does not show a track that never loaded
