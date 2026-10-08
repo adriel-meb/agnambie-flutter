@@ -10,6 +10,7 @@
 import 'package:agnambie/core/constants/gabon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'features/settings/settings_providers.dart';
 
 import 'package:agnambie/features/home/home_screen.dart';
@@ -19,6 +20,8 @@ import 'package:agnambie/features/player/mini_player.dart';
 
 import 'core/analytics/analytics_service.dart';
 import 'core/constants/theme.dart';
+
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 /// The root widget of the Agnambie application.
 ///
@@ -54,6 +57,9 @@ class _MainAppState extends ConsumerState<MainApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ref.watch(themeModeProvider),
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+      ],
       home: Scaffold(
         appBar: AppBar(
           title: const Text(Constants.APP_TITLE),
@@ -90,7 +96,9 @@ class _MainAppState extends ConsumerState<MainApp> {
         body: Column(
           children: [
             // IndexedStack preserves state and scroll positions of inactive tabs
-            Expanded(child: IndexedStack(index: _selectedIndex, children: pages)),
+            Expanded(
+              child: IndexedStack(index: _selectedIndex, children: pages),
+            ),
             // Persistent audio player docked at bottom of the active screen
             const MiniPlayer(),
           ],

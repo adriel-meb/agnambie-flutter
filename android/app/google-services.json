@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "27488903623",
+    "project_id": "agnambie-app-f4669",
+    "storage_bucket": "agnambie-app-f4669.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27488903623:android:314c7d9d6bacd7068779e2",
+        "android_client_info": {
+          "package_name": "com.agnambie.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRFv9ELCV1A_xaxTSjTgbL6-ZIHE4tF98"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

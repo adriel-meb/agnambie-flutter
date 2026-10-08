@@ -7,14 +7,19 @@
 // Last Modified: 2026-09-26
 // -----------------------------------------------------------------------------
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
 import 'app.dart';
 import 'core/network/api_client.dart';
 import 'data/repositories/audio_handler.dart';
 import 'data/repositories/providers.dart';
+import 'firebase_options.dart';
 
 /// Application entry point.
 ///
@@ -24,7 +29,23 @@ import 'data/repositories/providers.dart';
 Future<void> main() async {
   // Required for asynchronous platform channel operations before runApp
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  if (kDebugMode) {
+    // Force disable Crashlytics collection while doing every day development.
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+  } else {
+    // Pass all uncaught "fatal" errors from the framework to Crashlytics
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
+
   // Initialize Hive for local caching/storage
   await Hive.initFlutter();
 
