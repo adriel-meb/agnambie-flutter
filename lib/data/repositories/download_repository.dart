@@ -42,23 +42,62 @@ class DownloadRepository {
   }) async {
     final dir = await getApplicationDocumentsDirectory();
     final ext = url.contains('.m3u8') ? '.m3u8' : '.mp3'; // Fallback for media container extension
-    
-    // Note: HLS m3u8 streams cannot be downloaded simply via single file get. 
-    // This implementation works for MP3/WebM CDN files.
     final filePath = '${dir.path}/$bibleId-$bookId-$chapter$ext';
-
-    // Download the file stream to disk
-    await _dio.download(url, filePath);
     
-    final file = File(filePath);
-    final sizeInBytes = await file.length();
+    int totalSizeInBytes = 0;
+
+    if (ext == '.m3u8') {
+      // Fetch the playlist content
+      final response = await _dio.get<String>(url);
+      final playlistContent = response.data!;
+      final lines = playlistContent.split('\n');
+      
+      final localPlaylistLines = <String>[];
+      int segmentIndex = 0;
+      
+      // Extract base URL for relative segment paths
+      final baseUrl = url.substring(0, url.lastIndexOf('/') + 1);
+      
+      for (final line in lines) {
+        if (line.trim().isEmpty) continue;
+        
+        if (line.startsWith('#')) {
+          localPlaylistLines.add(line);
+        } else {
+          // It's a segment URL
+          final segmentUrl = line.startsWith('http') ? line : '$baseUrl$line';
+          // Use .mp3 since they are audio segments and it works fine, or extract extension
+          final segmentFilename = '$bibleId-$bookId-$chapter-seg$segmentIndex.mp3';
+          final segmentPath = '${dir.path}/$segmentFilename';
+          
+          await _dio.download(segmentUrl, segmentPath);
+          final segmentFile = File(segmentPath);
+          totalSizeInBytes += await segmentFile.length();
+          
+          // Add relative path to local playlist
+          localPlaylistLines.add(segmentFilename);
+          segmentIndex++;
+        }
+      }
+      
+      // Save local playlist
+      final localPlaylistFile = File(filePath);
+      await localPlaylistFile.writeAsString(localPlaylistLines.join('\n'));
+      totalSizeInBytes += await localPlaylistFile.length();
+      
+    } else {
+      // Standard single file download
+      await _dio.download(url, filePath);
+      final file = File(filePath);
+      totalSizeInBytes = await file.length();
+    }
 
     final download = Download(
       bibleId: bibleId,
       bookId: bookId,
       chapter: chapter,
       filePath: filePath,
-      sizeInBytes: sizeInBytes,
+      sizeInBytes: totalSizeInBytes,
       downloadedAt: DateTime.now(),
       bibleVersion: bibleVersion,
       bibleName: bibleName,
@@ -73,8 +112,22 @@ class DownloadRepository {
     final download = await _localData.getDownload(bibleId, bookId, chapter);
     if (download != null) {
       final file = File(download.filePath);
-      // ignore: avoid_slow_async_io — no safe sync alternative for file.exists() cross-platform
+      // ignore: avoid_slow_async_io
       if (await file.exists()) {
+        if (download.filePath.endsWith('.m3u8')) {
+          // Read the m3u8 to find and delete the segments
+          final lines = await file.readAsLines();
+          final dirPath = file.parent.path;
+          for (final line in lines) {
+            if (line.trim().isNotEmpty && !line.startsWith('#')) {
+              final segmentFile = File('$dirPath/$line');
+              // ignore: avoid_slow_async_io
+              if (await segmentFile.exists()) {
+                await segmentFile.delete();
+              }
+            }
+          }
+        }
         await file.delete();
       }
       await _localData.deleteDownload(bibleId, bookId, chapter);

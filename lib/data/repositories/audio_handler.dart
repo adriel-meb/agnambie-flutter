@@ -39,18 +39,18 @@ class AppAudioHandler extends BaseAudioHandler with SeekHandler {
   /// (e.g. positionStream, durationStream) for high-refresh-rate UI updates.
   AudioPlayer get player => _player;
 
-  /// Loads a single URL and starts playing it.
+  /// Loads a single [AudioSource] and starts playing it.
   ///
   /// Updates the current [mediaItem] metadata on the lock screen and in the
   /// notification area before configuring the [AudioSource] and starting playback.
   /// Throws if the audio cannot be fetched or parsed.
-  Future<void> loadAndPlay(String url, MediaItem mediaItem) async {
+  Future<void> loadAndPlay(AudioSource source, MediaItem mediaItem) async {
     // Publish media metadata to OS notification before audio starts loading
     this.mediaItem.add(mediaItem);
-    debugPrint('Loading audio URL: $url');
+    debugPrint('Loading audio source: ${source.sequence.firstOrNull?.tag}');
     try {
       // Set audio URI source for streaming playback
-      await _player.setAudioSource(AudioSource.uri(Uri.parse(url)));
+      await _player.setAudioSource(source);
       play();
     } catch (e) {
       // Broadcast error state if network drops or URI fails to resolve

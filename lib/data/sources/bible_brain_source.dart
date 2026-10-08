@@ -3,7 +3,7 @@
 // Purpose: Concrete implementation of BibleAudioSource communicating with the backend proxy.
 // Author: Agnambie Team
 // Creation date: 2026-09-26
-// Last modified: 2026-09-26
+// Last modified: 2026-10-08
 // -----------------------------------------------------------------------------
 
 import 'package:dio/dio.dart';
@@ -131,8 +131,13 @@ class BibleBrainSource implements BibleAudioSource {
       if (path == null || path.isEmpty) {
         throw const NoAudioAvailableException('Audio URL is empty');
       }
-      
-      return path;
+
+      // HLS filesets come back as a relative backend link
+      // (e.g. `/api/v1/audio/playlist?...`) so the API key stays server-side.
+      // Resolve it against the API base URL; absolute CDN URLs pass through.
+      return Uri.parse(_apiClient.dio.options.baseUrl)
+          .resolve(path)
+          .toString();
     } on DioException catch (e) {
       throw e.error as ApiException? ?? const NetworkException('Unknown error');
     }

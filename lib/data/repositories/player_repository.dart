@@ -8,6 +8,7 @@
 // Last modified: 2026-09-26
 // =============================================================================
 
+import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../core/utils/book_names.dart';
@@ -58,27 +59,13 @@ class PlayerRepository {
   }) async {
     try {
       final download = await _downloadRepository.getDownload(bibleId, bookId, chapter);
-      String url;
-      if (download != null) {
-        url = 'file://${download.filePath}';
-      } else {
-        url = await _catalogRepository.getChapterAudioUrl(
-          languageIso,
-          bibleId,
-          bookId,
-          chapter,
-        );
-      }
-
       
-      // Fetch the CDN URL from our Go backend / data source
-
       // Resolve human-readable or localized book name
       final bookNameDisplay = BookNames.getBestName(bookId);
 
       // Pass the metadata to the OS (Lock screen / Control Center / notification drawer)
-      final mediaItem = MediaItem(
-        id: url,
+      var mediaItem = MediaItem(
+        id: download != null ? 'file://${download.filePath}' : 'network', // Will be updated for network
         album: '$languageIso · $bibleId',
         title: '$bookNameDisplay · Chapitre $chapter',
         artUri: Uri.parse('https://images.unsplash.com/photo-1507692049790-de58290a4334?w=800&q=80'), // Placeholder artwork
@@ -91,8 +78,39 @@ class PlayerRepository {
         },
       );
 
+      AudioSource audioSource;
+      if (download != null) {
+        if (download.filePath.endsWith('.m3u8')) {
+          final playlistFile = File(download.filePath);
+          final lines = await playlistFile.readAsLines();
+          final dirPath = playlistFile.parent.path;
+          final sources = <AudioSource>[];
+          
+          for (final line in lines) {
+            if (line.isNotEmpty && !line.startsWith('#')) {
+              // line is the segment filename
+              final segmentPath = '$dirPath/$line';
+              sources.add(AudioSource.uri(Uri.file(segmentPath), tag: mediaItem));
+            }
+          }
+          // ignore: deprecated_member_use
+          audioSource = ConcatenatingAudioSource(children: sources);
+        } else {
+          audioSource = AudioSource.uri(Uri.file(download.filePath), tag: mediaItem);
+        }
+      } else {
+        final url = await _catalogRepository.getChapterAudioUrl(
+          languageIso,
+          bibleId,
+          bookId,
+          chapter,
+        );
+        mediaItem = mediaItem.copyWith(id: url); // Update ID with actual network URL
+        audioSource = AudioSource.uri(Uri.parse(url), tag: mediaItem);
+      }
+
       // Load the audio source and play
-      await _audioHandler.loadAndPlay(url, mediaItem);
+      await _audioHandler.loadAndPlay(audioSource, mediaItem);
       
     } catch (e) {
       // If the backend returns 404 or network drops, bubble up to UI

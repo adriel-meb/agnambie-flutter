@@ -52,12 +52,25 @@ android {
         release {
             if (hasKeystore) {
                 signingConfig = signingConfigs.getByName("release")
-            } else {
-                // Falls back to debug signing when key.properties is not yet configured
-                signingConfig = signingConfigs.getByName("debug")
             }
+            // No debug-signing fallback: a debug-signed release would be rejected by
+            // the Play Store, so missing credentials must fail the build (see below).
         }
     }
+}
+
+// Fail fast if a release artifact is requested without signing credentials.
+// Checked against the requested task names so debug/profile builds keep working
+// on machines (or CI jobs) that don't have the keystore.
+val isReleaseTaskRequested = gradle.startParameter.taskNames.any {
+    it.contains("Release", ignoreCase = true)
+}
+if (isReleaseTaskRequested && !hasKeystore) {
+    throw GradleException(
+        "Release signing is not configured: android/key.properties is missing. " +
+            "Copy android/key.properties.example to android/key.properties and " +
+            "fill in your upload keystore details before building a release."
+    )
 }
 
 kotlin {

@@ -4,7 +4,7 @@
 //          requests, including base URL resolution, timeouts, and error handling.
 // Author: Agnambie Team
 // Creation Date: 2026-09-26
-// Last Modified: 2026-09-26
+// Last Modified: 2026-10-08
 // -----------------------------------------------------------------------------
 
 import 'package:dio/dio.dart';
@@ -150,15 +150,52 @@ class ApiClient {
   /// Can be configured at build/run time via:
   /// `--dart-define=API_BASE_URL=https://api.yourdomain.com`
   ///
-  /// Falls back to local development URLs if unspecified.
+  /// Falls back to local development URLs if unspecified (debug/profile only;
+  /// release builds require an https URL — see [resolveBaseUrl]).
   String _getBaseUrl() {
     const definedUrl = String.fromEnvironment('API_BASE_URL');
+    return resolveBaseUrl(
+      definedUrl: definedUrl,
+      isRelease: kReleaseMode,
+      isAndroid: !kIsWeb && defaultTargetPlatform == TargetPlatform.android,
+    );
+  }
+
+  /// Resolves the API base URL from the compile-time [definedUrl].
+  ///
+  /// In release builds ([isRelease]), [definedUrl] must be a valid `https://`
+  /// URL; otherwise a [StateError] is thrown so a misconfigured build fails
+  /// immediately at launch instead of silently calling a localhost address
+  /// that doesn't exist on users' phones.
+  ///
+  /// In debug/profile builds an empty [definedUrl] falls back to the local
+  /// development proxy (`10.0.2.2` on the Android emulator when [isAndroid]).
+  @visibleForTesting
+  static String resolveBaseUrl({
+    required String definedUrl,
+    required bool isRelease,
+    required bool isAndroid,
+  }) {
+    if (isRelease) {
+      if (definedUrl.isEmpty) {
+        return 'https://agnambie-backend.onrender.com';
+      }
+      final uri = Uri.tryParse(definedUrl);
+      if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
+        throw StateError(
+          'API_BASE_URL must be set to an https:// URL for release builds. '
+          'Build with --dart-define=API_BASE_URL=https://api.yourdomain.com',
+        );
+      }
+      return definedUrl;
+    }
+
     if (definedUrl.isNotEmpty) {
       return definedUrl;
     }
 
     // 10.0.2.2 is the special alias to your host loopback interface from an Android emulator.
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    if (isAndroid) {
       return 'http://10.0.2.2:8080';
     }
     // For iOS Simulator, Web, or native desktop, localhost works fine.

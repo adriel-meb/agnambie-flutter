@@ -89,6 +89,11 @@ flutter build apk --release --dart-define=API_BASE_URL=https://api.yourdomain.co
 flutter build appbundle --release --dart-define=API_BASE_URL=https://api.yourdomain.com
 ```
 
+> [!IMPORTANT]
+> `API_BASE_URL` is **required** for release builds and must be an `https://` URL.
+> A release build without it stops at launch with a `StateError` instead of silently
+> calling `localhost`. Debug/profile builds keep the local fallback.
+
 #### Release Keystore Signing
 To sign release builds:
 1. Generate an upload keystore:
@@ -96,7 +101,7 @@ To sign release builds:
    keytool -genkey -v -keystore android/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
    ```
 2. Copy `android/key.properties.example` to `android/key.properties` and fill in your passwords and file path.
-3. If `key.properties` is omitted, release builds automatically fall back to debug signing for testing.
+3. If `key.properties` is missing, any release build fails with a clear Gradle error. There is no debug-signing fallback, because the Play Store rejects debug-signed builds. Debug builds don't need the keystore.
 
 ### Environment
 
@@ -252,6 +257,16 @@ downloading out-of-scope content.
 
 The Bible Brain API key is **never shipped inside the Flutter app**. A Go backend proxy
 (`agnambie-backend`) holds the key and safely re-exposes the necessary routes.
+
+**Production Deployment:**
+The backend proxy is currently deployed for free on Render at:
+`https://agnambie-backend.onrender.com`
+
+When building the app for release (e.g., `flutter build apk`), the `ApiClient` automatically defaults to this production URL.
+To override it during development, you can pass a `--dart-define` flag:
+```bash
+flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8080
+```
 
 The proxy is also purpose-built for low-bandwidth Africa:
 
